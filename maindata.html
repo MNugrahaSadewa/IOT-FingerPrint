@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script>
+        function showSection(sectionId) {
+            document.getElementById('audit-log-section').style.display = 'none';
+            document.getElementById('user-data-section').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        window.onload = function() {
+            showSection('audit-log-section');
+        }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAiojSjyNXrMOOsP75WQ1RPk2U3moM2dbA",
+            authDomain: "project-iot-fingerprint.firebaseapp.com",
+            databaseURL: "https://project-iot-fingerprint-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "project-iot-fingerprint",
+            storageBucket: "project-iot-fingerprint.appspot.com",
+            messagingSenderId: "1033562070562",
+            appId: "1:1033562070562:web:e16c1393dcaadcccb7347b",
+            measurementId: "G-GJLKL45TKW"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script>
+        var database = firebase.database();
+        var ref = database.ref('Registrasi');
+        ref.on('value', function(snapshot) {
+            var data = snapshot.val();
+            var html = '';
+            if (data) {
+                Object.keys(data).forEach(function(key) {
+                    var entry = data[key];
+                    // Pastikan untuk memeriksa apakah entry.id dan entry.time ada
+                    html += '<tr><td>' + (entry.id || 'No ID') + '</td><td>' + (entry.time || 'No Timestamp') + '</td></tr>';
+                });
+                document.getElementById('audit-log-section').getElementsByTagName('tbody')[0].innerHTML = html;
+            } else {
+                console.log("No data available");
+                document.getElementById('audit-log-section').getElementsByTagName('tbody')[0].innerHTML = '<tr><td colspan="2">No Data</td></tr>';
+            }
+        });
+        
+    </script>
+    
+    <script>
+        var ref = firebase.database().ref('Registrasi');
+        ref.on('value', function(snapshot) {
+            var data = snapshot.val();
+            var tbody = document.getElementById('user-data-tbody'); // Pastikan ini sesuai dengan id dari <tbody> di bawah
+            tbody.innerHTML = ''; // Kosongkan <tbody> untuk mengisi ulang data
+            if (data) {
+                Object.keys(data).forEach(function(userName) {
+                    var entry = data[userName];
+                    var row = '<tr><td>' + userName + '</td><td>' + (entry.id || 'No ID') + '</td><td>' + (entry.time || 'No Timestamp') + '</td></tr>';
+                    tbody.innerHTML += row; // Tambahkan setiap baris ke <tbody>
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3">No Data Available</td></tr>'; // Tampilkan pesan jika tidak ada data
+            }
+        });
+    </script>
+    
+
+      
+    
+</head>
+<head>
+    <style>
+        /* Mengatur gaya tabel secara umum */
+        table {
+            width: 100%; 
+            border-collapse: collapse; /* Menghilangkan double borders */
+        }
+
+        /* Mengatur gaya untuk header tabel */
+        th, td {
+            border: 1px solid #ccc; /* Garis abu-abu */
+            padding: 10px; /* Padding untuk teks dalam sel */
+            text-align: left; /* Menyatukan posisi teks ke kiri */
+        }
+
+        th {
+            background-color: #f0f0f0; /* Warna latar belakang untuk header */
+        }
+
+        /* Mengatur gaya untuk setiap baris tabel */
+        tr:nth-child(odd) {
+            background-color: #f9f9f9; /* Warna latar belakang untuk baris ganjil */
+        }
+
+        tr:nth-child(even) {
+            background-color: #ffffff; /* Warna latar belakang untuk baris genap */
+        }
+
+        tr:hover {
+            background-color: #e0e0e0; /* Warna latar belakang saat hover */
+        }
+    </style>
+    
+</head>
+
+
+<body style="font-family: Arial, sans-serif; background-color: #9bfaff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; height: 100vh;">
+    <div style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 80%; max-width: 800px;">
+        <h2 style="margin-bottom: 20px; text-align: center;">Dashboard</h2>
+        <div style="margin-bottom: 20px; text-align: center;">
+            <button onclick="showSection('audit-log-section')" style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 5px; cursor: pointer; background-color: #007BFF; color: white;">Audit Log</button>
+            <button onclick="showSection('user-data-section')" style="padding: 10px 20px; margin: 0 10px; border: none; border-radius: 5px; cursor: pointer; background-color: #007BFF; color: white;">User Data</button>
+        </div>
+        <div id="audit-log-section" style="display: block;">
+            <h3 style="text-align: center;">Audit Log</h3>  
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>test1</td>
+                        <td>2024-05-20 14:23:45</td>
+                    </tr>
+                    <tr>
+                        <td>test2</td>
+                        <td>2024-05-21 09:12:30</td>
+                    </tr>
+                    <tr>
+                        <td>test3</td>
+                        <td>2024-05-21 11:45:10</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <body>
+            <div id="user-data-section" style="display: block;">
+                <h3 style="text-align: center;">User Data</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>User ID</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-data-tbody">
+                        <!-- Baris data akan diisi di sini oleh skrip Firebase -->
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        
+        
+        
+    </div>
+</body>
+</html>

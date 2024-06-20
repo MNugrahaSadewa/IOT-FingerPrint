@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script>
+        function validateLogin(event) {
+            event.preventDefault(); 
+
+            const contohid = "user123";
+            const contohpass = "password";
+
+            const userID = document.getElementById('userID').value;
+            const password = document.getElementById('password').value;
+
+            if (userID === contohid && password === contohpass) {
+                alert("Login successful!");
+                window.location.href = "maindata.html";
+                
+            } else {
+                alert("Invalid User ID or Password.");
+            }
+        }
+    </script>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #92f3fc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background-color: #fff; padding: 20px; border-radius: 20px;">
+        <h2 style="margin-bottom: 20px;">Login</h2>
+        <form onsubmit="validateLogin(event)">
+            <label for="userID" style="display: block; margin-bottom: 5px;">User ID</label>
+            <input type="text" id="userID" name="userID" placeholder="User Id" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;">
+            
+            <label for="password" style="display: block; margin-bottom: 5px;">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;">
+            
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Login</button>
+        </form>
+    </div>
+</body>
+</html>
