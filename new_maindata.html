@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script>
+        function showSection(sectionId) {
+            document.getElementById('audit-log-section').style.display = 'none';
+            document.getElementById('user-data-section').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        window.onload = function() {
+            showSection('audit-log-section');
+        }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-database.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyAiojSjyNXrMOOsP75WQ1RPk2U3moM2dbA",
+            authDomain: "project-iot-fingerprint.firebaseapp.com",
+            databaseURL: "https://project-iot-fingerprint-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "project-iot-fingerprint",
+            storageBucket: "project-iot-fingerprint.appspot.com",
+            messagingSenderId: "1033562070562",
+            appId: "1:1033562070562:web:e16c1393dcaadcccb7347b",
+            measurementId: "G-GJLKL45TKW"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script>
+        var database = firebase.database();
+        var ref = database.ref('Registrasi');
+        ref.on('value', function(snapshot) {
+            var data = snapshot.val();
+            var html = '';
+            if (data) {
+                Object.keys(data).forEach(function(key) {
+                    var entry = data[key];
+                    html += '<tr><td>' + (entry.id || 'No ID') + '</td><td>' + (entry.time || 'No Timestamp') + '</td><td><button onclick="removeEntry(\'' + key + '\')">Remove</button></td></tr>';
+                });
+                document.getElementById('audit-log-section').getElementsByTagName('tbody')[0].innerHTML = html;
+            } else {
+                console.log("No data available");
+                document.getElementById('audit-log-section').getElementsByTagName('tbody')[0].innerHTML = '<tr><td colspan="3">No Data</td></tr>';
+            }
+        });
+
+    </script>
+    <script>
+        async function hashValue(value) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(value);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        var ref = firebase.database().ref('Registrasi');
+        ref.on('value', async function(snapshot) {
+            var data = snapshot.val();
+            var tbody = document.getElementById('user-data-tbody');
+            tbody.innerHTML = ''; 
+            if (data) {
+                var uniqueUserIds = []; // Array to track unique user IDs
+                Object.keys(data).forEach(async function(userName) {
+                    var entry = data[userName];
+                    var hashedUserName = await hashValue(userName); // Hash the username
+                    if (!uniqueUserIds.includes(entry.id)) { // Check if user ID is unique
+                        uniqueUserIds.push(entry.id); // Add user ID to the array
+                        var row = '<tr><td>' + hashedUserName + '</td><td>' + (entry.id || 'No ID') + '</td><td><button onclick="removeEntry(\'' + userName + '\')">Remove</button></td></tr>';
+                        tbody.innerHTML += row; 
+                    }
+            });
+    } else {
+        tbody.innerHTML = '<tr><td colspan="3">No Data Available</td></tr>';
+    }
+});
+
+        function removeEntry(key) {
+            var ref = firebase.database().ref('Registrasi/' + key);
+            ref.remove()
+            .then(function() {
+                console.log("Remove succeeded.");
+                alert("Entry removed successfully.");
+            })
+            .catch(function(error) {
+                console.log("Remove failed: " + error.message);
+                alert("Failed to remove entry: " + error.message);
+            });
+        }
+    </script>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #9bfaff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+        }
+        h2, h3 {
+            margin-bottom: 20px;
+        }
+        #user-data-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Dashboard</h2>
+        <div class="button-section">
+            <button onclick="showSection('audit-log-section')">Audit Log</button>
+            <button onclick="showSection('user-data-section')">User Data</button>
+        </div>
+        <div id="audit-log-section">
+            <h3>Audit Log</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data rows will be filled here by Firebase script -->
+                </tbody>
+            </table>
+        </div>
+        <div id="user-data-section">
+            <h3>User Data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>User ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-data-tbody">
+                    <!-- Data rows will be filled here by Firebase script -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
